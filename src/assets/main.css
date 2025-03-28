@@ -1,0 +1,17 @@
+/* Global styles */
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #app {
+    padding: 0;
+  }
+}
