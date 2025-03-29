@@ -40,6 +40,131 @@ npm run dist
 
 This command builds the Vue.js application and places the output directly in the Spring Boot static resources directory. The output directory is automatically cleaned before each build to prevent issues with stale files.
 
+## Testing
+
+The application is thoroughly tested using Vitest, a Vite-based unit test framework with a Jest-compatible API.
+
+### Running Tests
+
+To run the tests, use the following npm command:
+
+```bash
+npm run test:unit
+```
+
+For continuous testing during development:
+
+```bash
+npm run test:unit -- --watch
+```
+
+To generate a coverage report:
+
+```bash
+npm run test:unit -- --coverage
+```
+
+### Test Structure
+
+The tests are organized in a similar structure to the application:
+
+- `/src/components/__tests__/` - Tests for Vue components
+- `/src/views/__tests__/` - Tests for Vue views
+- `/src/services/__tests__/` - Tests for services like WebSocket
+
+### Test Coverage
+
+The tests cover the following aspects of the application:
+
+#### Component Tests (ChatClient.vue)
+
+- Rendering of empty state when no messages
+- Rendering of messages when they exist
+- Input field behavior when connected/disconnected
+- Sending messages via button click
+- Sending messages via Enter key
+- Format time display
+
+#### View Tests (HomeView.vue)
+
+- Status indicator for WebSocket connection
+- Connection/Disconnection functionality
+- Username update
+- Message sending/receiving
+- WebSocket auto-reconnection
+- User count display
+- Ping/Pong mechanism
+
+#### Service Tests (websocket.js)
+
+- WebSocket connection initialization
+- Sending and receiving messages
+- Automatic reconnection
+- Manual connection closing
+- Heartbeat mechanism
+- Error handling
+
+### Mocking Techniques
+
+The tests use various mocking techniques to create reliable and controlled test environments:
+
+1. **WebSocket Mock**: A custom mock implementation of the WebSocket API that allows controlled event triggering
+2. **Environment Variables**: Import.meta.env variables are mocked to simulate different configurations
+3. **Window Location**: Browser location is mocked for URL generation testing
+4. **Timer Mocking**: Direct timer mocking to avoid infinite loops and make tests predictable
+5. **Console Methods**: Console.log and console.error are spied on to verify error handling
+
+### WebSocket Test Helpers
+
+The WebSocket mock includes explicit trigger methods instead of relying on timers:
+
+- `triggerOpen()`: Explicitly trigger the WebSocket open event
+- `triggerMessage(data)`: Explicitly trigger a message received event
+- `triggerError()`: Explicitly trigger an error event
+- `triggerClose()`: Explicitly trigger a close event
+
+This approach provides several advantages:
+- No dependency on timers that can cause infinite loops
+- Full control over the event sequence
+- Tests are more readable and maintainable
+- Consistent behavior across test runs
+
+### Best Practices and Solutions for WebSocket Testing
+
+These tests demonstrate several best practices for testing WebSocket applications:
+
+1. **Explicit Event Triggering**: Using direct trigger methods instead of timers for WebSocket events
+2. **Timer Function Replacement**: Replacing global timer functions to avoid infinite loops
+   ```javascript
+   // Instead of using vi.runAllTimers() which can cause infinite loops
+   global.setInterval = vi.fn().mockImplementation(() => 999);
+   ```
+
+3. **Callback Execution Control**: Storing and manually executing timer callbacks
+   ```javascript
+   let timeoutCallbacks = [];
+   global.setTimeout = vi.fn().mockImplementation((callback, delay) => {
+     timeoutCallbacks.push({ callback, delay });
+     return 888;
+   });
+   // Later in test: timeoutCallbacks[0].callback();
+   ```
+
+4. **Isolated Tests**: Each test focuses on a single aspect of behavior with proper cleanup
+5. **Behavior Testing**: Testing behavior and outcomes rather than implementation details
+6. **Mock Cleanup**: Thorough cleanup of mocks and timers between tests
+   ```javascript
+   afterEach(() => {
+     vi.clearAllMocks();
+     vi.clearAllTimers();
+     MockWebSocket.resetAll();
+     clearAllIntervals();
+   });
+   ```
+
+7. **Async Testing**: Proper use of async/await and nextTick for Vue component updates
+8. **Clear Assertions**: Direct assertions about component state and behavior
+
 ## Configuration
 
 The application uses environment variables for configuration:
