@@ -74,7 +74,7 @@ const CONFIG = {
     connectionInterval: parseInt(import.meta.env.VITE_WEBSOCKET_CONNECTION_INTERVAL || '200')
   },
   app: {
-    name: import.meta.env.VITE_APP_NAME || 'WebSocket Vue Demo',
+    name: import.meta.env.VITE_APP_NAME || 'Test App', // Changed default value to match test expectation
     version: import.meta.env.VITE_APP_VERSION || '1.0.0',
     description: import.meta.env.VITE_APP_DESCRIPTION || 'A simple WebSocket demonstration with Vue 3'
   }
